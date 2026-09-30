@@ -1,5 +1,7 @@
 # KORTEX — AI Edu Platform
 
+Built solo by Aymen Fouatih, telecommunications engineer (ENSTTIC, Algeria).
+
 An online course platform where the entire content pipeline — topic discovery, curriculum
 design, lesson/exercise writing, quality control, exam generation, and a support chatbot — is
 built and run by orchestrated LLM agents, sitting behind a self-built LMS with real payments,
@@ -46,7 +48,7 @@ an AI/agent security course (prompt injection, shadow AI, IAM governance).
   explored in later pilots wasn't good enough by launch, so video was cut from the v1 scope
   rather than delaying the launch.
 - **The deployment is currently paused**, by choice — this is a solo-built commercial project at
-  prototype/early-traction stage, not an abandoned one.
+  prototype stage, not an abandoned one.
 - **No transactional email**: the purchase access link is shown on the success page and logged
   server-side, not emailed.
 - **2 of 6 configured domains actually published.** The autonomous scheduler
@@ -303,6 +305,11 @@ python -m venv venv
 
 This should reproduce 847 passing tests with zero network calls and zero cost — everything
 touching an LLM, TTS, or payment provider is mocked.
+
+## Author
+
+Aymen Fouatih, telecommunications engineer (ENSTTIC, Oran, Algeria), working on LLM agents and
+RAG systems. Contact: contact@aymen-automation.site.
 
 ## License
 
