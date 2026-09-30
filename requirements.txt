@@ -1,0 +1,12 @@
+claude-agent-sdk
+anthropic
+langgraph
+pytest
+python-dotenv
+mutagen
+requests
+flask
+gunicorn
+SQLAlchemy
+Authlib
+reportlab

@@ -1,0 +1,24 @@
+{% extends "base_reading.html" %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<span class="chapter-eyebrow">Votre cours</span>
+<h1 class="dash-title">{{ course.title }}</h1>
+<p class="dash-sub">Choisissez un chapitre pour commencer. Les chapitres s'appuient les uns sur les
+autres : une progression dans l'ordre est recommandée.</p>
+
+{# Pas de bandeau examen/attestation ici : exam_ready/certificate_ready (app.py) sont une logique
+   propre au cours 1 (_exam_ready/_certificate_ready ferment sur la variable `course` module,
+   cours 1). Étendre l'examen/attestation à un autre cours est hors périmètre de ce fix. #}
+
+<div class="chapter-dash-grid">
+  {% for chap in course.chapters %}
+  <a class="chapter-dash-card" href="{{ url_for('course_chapter', slug=course.slug, number=chap.number) }}">
+    <span class="num">{{ chap.number }}</span>
+    <div>
+      <h3>{{ chap.title }}</h3>
+      <p>{{ chap.learning_objectives[0] }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

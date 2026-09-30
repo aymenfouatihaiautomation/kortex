@@ -1,0 +1,19 @@
+{% extends "base_marketing.html" %}
+{% block title %}Nouveau mot de passe{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="simple-card">
+    <h1>Nouveau mot de passe</h1>
+    {% if invalid %}
+    <div class="auth-message error">Ce lien de réinitialisation est invalide ou a expiré.</div>
+    <div class="auth-links"><a href="{{ url_for('accounts.reset_password_request') }}">Demander un nouveau lien</a></div>
+    {% else %}
+    {% if error %}<div class="auth-message error">{{ error }}</div>{% endif %}
+    <form method="post">
+      <input type="password" name="password" placeholder="Nouveau mot de passe (8 caractères minimum)" required minlength="8" autofocus>
+      <button type="submit" class="btn btn-grad btn-block">Changer le mot de passe</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

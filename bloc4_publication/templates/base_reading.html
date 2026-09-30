@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ course.title if course is defined else "AI Edu Platform" }}{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/reading.css') }}">
+</head>
+<body>
+  <header class="site-nav">
+    <div class="wrap nav-row">
+      <a class="wordmark" href="{{ url_for('home') }}"><span class="mark"></span>AI Edu Platform</a>
+      <div class="nav-reading-right">
+        {% if course is defined %}<span class="nav-meta">{{ course.title }}</span>{% endif %}
+        {% if session.get('email') %}
+        <form method="post" action="{{ url_for('accounts.logout') }}" class="nav-logout-form">
+          <button type="submit" class="nav-logout-btn">Déconnexion</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% block progress %}{% endblock %}
+
+  <main class="wrap content-shell">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="wordmark" href="{{ url_for('home') }}"><span class="mark"></span>AI Edu Platform</a>
+        <p class="footer-note">Édité par Aymene Ahmed Fouatih, à titre individuel.</p>
+      </div>
+      <div class="footer-links">
+        <a href="{{ url_for('terms') }}">Conditions d'utilisation</a>
+        <a href="{{ url_for('privacy') }}">Confidentialité</a>
+        <a href="{{ url_for('refunds') }}">Remboursement</a>
+        <a href="mailto:{{ contact_email }}">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function selectMcqOption(optionEl) {
+      var card = optionEl.closest(".exercise-card");
+      if (card.classList.contains("answered")) return;
+      card.classList.add("answered");
+
+      var isCorrect = optionEl.dataset.correct === "true";
+      var options = card.querySelectorAll(".opt");
+      options.forEach(function (opt) {
+        opt.disabled = true;
+        if (opt.dataset.correct === "true") {
+          opt.classList.add("correct");
+        }
+      });
+      if (!isCorrect) {
+        optionEl.classList.add("incorrect");
+      }
+
+      var feedback = card.querySelector('[data-role="feedback"]');
+      if (feedback) {
+        var message = isCorrect
+          ? "Bonne réponse."
+          : "Pas tout à fait — la bonne réponse est mise en évidence ci-dessus.";
+        var explanation = card.dataset.explanation;
+        if (explanation) {
+          message += " " + explanation;
+        }
+        feedback.textContent = message;
+        feedback.classList.add(isCorrect ? "correct" : "incorrect");
+        feedback.hidden = false;
+      }
+
+      // Suivi de participation (accounts/chapter_completion.py) : enregistre que ce QCM a été
+      // répondu, jamais si l'option choisie était correcte (ça reste 100% côté client, ci-dessus).
+      if (card.dataset.chapter !== undefined && card.dataset.exerciseIndex !== undefined) {
+        fetch("/chapter/" + card.dataset.chapter + "/exercise/" + card.dataset.exerciseIndex + "/answer", {
+          method: "POST",
+        })
+          .then(function (r) {
+            return r.ok ? r.json() : null;
+          })
+          .then(function (summary) {
+            if (summary) refreshChapterCompletionState(summary);
+          })
+          .catch(function () {});
+      }
+    }
+
+    function refreshChapterCompletionState(summary) {
+      var block = document.querySelector(".chapter-complete-block");
+      if (!block) return;
+      var btn = block.querySelector('[data-role="complete-chapter-btn"]');
+      var hint = block.querySelector('[data-role="complete-chapter-hint"]');
+      if (btn) {
+        btn.disabled = !summary.ready;
+      }
+      if (hint) {
+        if (!summary.ready && summary.missing && summary.missing.length) {
+          hint.textContent = "Il reste à répondre : " + summary.missing.join(", ") + ".";
+          hint.hidden = false;
+        } else {
+          hint.hidden = true;
+        }
+      }
+    }
+
+    async function fetchChapterProgress(chapterNumber) {
+      try {
+        var response = await fetch("/chapter/" + chapterNumber + "/progress");
+        if (!response.ok) return;
+        var summary = await response.json();
+        refreshChapterCompletionState(summary);
+      } catch (err) {
+        // Pas bloquant : l'état rendu par le serveur reste correct au prochain chargement de page.
+      }
+    }
+
+    async function completeChapter(buttonEl) {
+      var block = buttonEl.closest(".chapter-complete-block");
+      var hint = block.querySelector('[data-role="complete-chapter-hint"]');
+      var feedbackBox = block.querySelector('[data-role="complete-chapter-feedback"]');
+      buttonEl.disabled = true;
+
+      try {
+        var response = await fetch("/chapter/" + block.dataset.chapter + "/complete", { method: "POST" });
+        var data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          showFeedback(feedbackBox, "error", data.error || "Impossible de valider ce chapitre pour le moment.");
+          if (hint && data.missing) {
+            hint.textContent = "Il reste à répondre : " + data.missing.join(", ") + ".";
+            hint.hidden = false;
+          }
+          buttonEl.disabled = false;
+          return;
+        }
+
+        block.innerHTML = '<p class="chapter-complete-done">✅ Chapitre marqué comme terminé.</p>';
+      } catch (err) {
+        showFeedback(feedbackBox, "error", "Impossible de contacter le serveur. Réessaie dans quelques instants.");
+        buttonEl.disabled = false;
+      }
+    }
+
+    function showFeedback(box, kind, text) {
+      if (!box) return;
+      box.hidden = false;
+      box.className = "llm-feedback " + kind;
+      box.textContent = text;
+    }
+
+    function setRemaining(card, label, buttonEl, remaining) {
+      card.dataset.remaining = remaining;
+      if (label) {
+        label.textContent =
+          remaining > 0
+            ? remaining + " correction" + (remaining > 1 ? "s" : "") + " restante" + (remaining > 1 ? "s" : "")
+            : "Nombre maximal de corrections atteint";
+      }
+      if (remaining <= 0) {
+        buttonEl.disabled = true;
+      }
+    }
+
+    async function correctShortAnswer(buttonEl) {
+      var card = buttonEl.closest(".exercise-card");
+      var textarea = card.querySelector('[data-role="learner-answer"]');
+      var feedbackBox = card.querySelector('[data-role="llm-feedback"]');
+      var remainingLabel = card.querySelector('[data-role="remaining-label"]');
+      var answer = textarea ? textarea.value.trim() : "";
+
+      if (!answer) {
+        showFeedback(feedbackBox, "error", "Écris une réponse avant de demander une correction.");
+        return;
+      }
+
+      var originalLabel = buttonEl.textContent;
+      buttonEl.disabled = true;
+      buttonEl.textContent = "Correction en cours...";
+      showFeedback(feedbackBox, "loading", "Le correcteur analyse ta réponse...");
+
+      try {
+        var response = await fetch(
+          "/chapter/" + card.dataset.chapter + "/exercise/" + card.dataset.exerciseIndex + "/correct",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ answer: answer }),
+          }
+        );
+        var data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          showFeedback(feedbackBox, "error", data.error || "Une erreur est survenue. Réessaie dans quelques instants.");
+        } else {
+          showFeedback(feedbackBox, "done", data.feedback);
+        }
+        if (typeof data.remaining === "number") {
+          setRemaining(card, remainingLabel, buttonEl, data.remaining);
+        }
+      } catch (err) {
+        showFeedback(
+          feedbackBox,
+          "error",
+          "Impossible de contacter le correcteur (problème réseau). Réessaie dans quelques instants."
+        );
+      }
+
+      buttonEl.textContent = originalLabel;
+      if (card.dataset.remaining !== "0") {
+        buttonEl.disabled = false;
+      }
+      // La participation a pu être enregistrée côté serveur même si le correcteur a échoué
+      // au-dessus (on ne gate jamais sur la justesse de la correction) — on rafraîchit l'état du
+      // bouton "J'ai terminé ce chapitre" dans tous les cas.
+      fetchChapterProgress(card.dataset.chapter);
+    }
+
+    function onPracticalFileSelected(inputEl) {
+      var block = inputEl.closest(".practical-submit");
+      var label = block.querySelector('[data-role="practical-filename"]');
+      if (label) {
+        label.textContent = inputEl.files.length ? "📄 " + inputEl.files[0].name : "";
+      }
+    }
+
+    async function correctPracticalExercise(buttonEl) {
+      var block = buttonEl.closest(".practical-submit");
+      var textarea = block.querySelector('[data-role="practical-answer"]');
+      var fileInput = block.querySelector('[data-role="practical-file"]');
+      var feedbackBox = block.querySelector('[data-role="practical-feedback"]');
+      var remainingLabel = block.querySelector('[data-role="practical-remaining-label"]');
+      var answer = textarea ? textarea.value.trim() : "";
+      var file = fileInput && fileInput.files.length ? fileInput.files[0] : null;
+
+      if (!answer && !file) {
+        showFeedback(feedbackBox, "error", "Colle une réponse ou joins un fichier avant de demander une correction.");
+        return;
+      }
+
+      var originalLabel = buttonEl.textContent;
+      buttonEl.disabled = true;
+      buttonEl.textContent = "Correction en cours...";
+      showFeedback(feedbackBox, "loading", "Le correcteur analyse ta soumission...");
+
+      var formData = new FormData();
+      if (answer) formData.append("answer", answer);
+      if (file) formData.append("file", file);
+
+      try {
+        var response = await fetch("/chapter/" + block.dataset.chapter + "/practical/correct", {
+          method: "POST",
+          body: formData,
+        });
+        var data = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          showFeedback(feedbackBox, "error", data.error || "Une erreur est survenue. Réessaie dans quelques instants.");
+        } else {
+          showFeedback(feedbackBox, "done", data.feedback);
+        }
+        if (typeof data.remaining === "number") {
+          setRemaining(block, remainingLabel, buttonEl, data.remaining);
+        }
+      } catch (err) {
+        showFeedback(
+          feedbackBox,
+          "error",
+          "Impossible de contacter le correcteur (problème réseau). Réessaie dans quelques instants."
+        );
+      }
+
+      buttonEl.textContent = originalLabel;
+      if (block.dataset.remaining !== "0") {
+        buttonEl.disabled = false;
+      }
+      fetchChapterProgress(block.dataset.chapter);
+    }
+  </script>
+
+  {% if course is defined and course.slug is defined %}
+  {# Le tuteur n'est jamais rendu pour un visiteur non authentifié : course_home/chapter
+     redirigent déjà vers la landing page sans session valide (voir app.py) — pas de vérification
+     supplémentaire nécessaire ici. `course.slug is defined` en plus de `course is defined` :
+     certains tests rendent chapter.html avec un `course` minimal sans slug (voir
+     test_bloc4_chapter_format_rendering.py) — `|tojson` sur un Jinja Undefined lève une
+     exception, contrairement à une simple interpolation `{{ }}` qui l'affiche en vide. #}
+  {% include "_course_chat_widget.html" %}
+  {% endif %}
+</body>
+</html>

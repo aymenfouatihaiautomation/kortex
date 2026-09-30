@@ -1,0 +1,100 @@
+{% extends "base_marketing.html" %}
+{% block content %}
+<section class="hero-section">
+  <span class="glow glow-1"></span>
+  <span class="glow glow-2"></span>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow"><span class="pip">✦</span> Des cours pensés pour un vrai manque, pas pour remplir un catalogue</span>
+      <h1 class="hero-title">Apprenez ce qui <span class="grad-text">manque vraiment</span> ailleurs.</h1>
+      <p class="hero-sub">
+        Chaque cours part d'une vraie lacune identifiée dans ce qui existe déjà — pas d'un sujet
+        choisi au hasard. Contenu concret, structuré, pensé pour être appliqué, pas juste regardé.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-grad" href="{{ url_for('catalog') }}">Découvrir les cours</a>
+        <a class="btn btn-ghost" href="{{ url_for('about') }}">Comment on choisit les sujets</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="{{ url_for('static', filename='images/illustrations/hero.webp') }}" alt="">
+    </div>
+  </div>
+</section>
+
+{% set featured = courses[0] %}
+<section class="section" id="cours">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Cours disponible maintenant</span>
+      <h2>Le cours du moment</h2>
+      <p>{{ courses|length }} cours publié{{ "s" if courses|length > 1 else "" }} pour l'instant — chaque nouveau cours suit la même méthode avant d'être publié.</p>
+    </div>
+
+    <div class="spotlight">
+      <div>
+        <div class="badge-row">
+          <span class="badge grad">{{ featured.niche }}</span>
+          <span class="badge">Niveau {{ featured.level }}</span>
+          <span class="badge">{{ featured.chapters|length }} chapitres</span>
+        </div>
+        <h3>{{ featured.title }}</h3>
+        <p class="desc">{{ featured.description }}</p>
+        <a class="btn btn-ghost" href="{{ url_for('course_landing', slug=featured.slug) }}">Voir le programme complet →</a>
+      </div>
+
+      <div class="spotlight-buy">
+        <div>
+          <div class="price-big">{{ price }}</div>
+          <div class="price-cap">Achat unique · accès immédiat</div>
+        </div>
+        <a class="btn btn-grad btn-block" href="{{ url_for('course_landing', slug=featured.slug) }}">Voir ce cours</a>
+        <ul class="included">
+          <li><span class="ck">✓</span> {{ featured.chapters|length }} chapitres de leçons détaillées</li>
+          <li><span class="ck">✓</span> Exercices de compréhension par chapitre</li>
+          <li><span class="ck">✓</span> Un exercice pratique par chapitre</li>
+          <li><span class="ck">✓</span> Projet final intégrateur</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="methode">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Méthode</span>
+      <h2>Comment un cours arrive ici</h2>
+      <p>La même méthode, quel que soit le domaine — technique, business, créatif ou autre.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">1</div>
+        <h3>Repérer un vrai manque</h3>
+        <p>Le sujet est choisi parce qu'il comble une lacune constatée dans ce qui existe déjà — pas parce qu'il est à la mode.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">2</div>
+        <h3>Construire un programme progressif</h3>
+        <p>Chaque chapitre s'appuie explicitement sur le précédent, jusqu'à un projet final qui rassemble tout.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">3</div>
+        <h3>Vérifier avant de publier</h3>
+        <p>Le contenu passe par un contrôle qualité indépendant avant d'être mis en ligne — pas de publication à l'aveugle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="resultat">
+  <div class="wrap" style="text-align: center;">
+    <div class="section-head" style="margin-left: auto; margin-right: auto;">
+      <span class="kicker">Objectif</span>
+      <h2>Un vrai résultat à la fin, pas juste des vidéos vues</h2>
+      <p>Le projet final de chaque cours est pensé pour être montrable, pas seulement complété.</p>
+    </div>
+    <img src="{{ url_for('static', filename='images/illustrations/learning.webp') }}" alt="" style="max-width: 280px; width: 100%; height: auto; display: block; margin: 0 auto;">
+  </div>
+</section>
+{% endblock %}

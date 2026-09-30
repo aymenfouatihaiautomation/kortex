@@ -1,0 +1,46 @@
+{% extends "base_marketing.html" %}
+{% block title %}Politique de confidentialité{% endblock %}
+{% block content %}
+<section class="wrap prose">
+<h1>Politique de confidentialité</h1>
+<p><em>Dernière mise à jour : 2026-08-02.</em></p>
+
+<p>Cette page décrit précisément quelles données sont collectées par ce site et comment elles sont
+utilisées — rien de plus que ce qui est listé ici.</p>
+
+<h2>1. Données collectées</h2>
+<ul>
+  <li><strong>Adresse email</strong> : fournie au moment de l'achat, utilisée pour vous accorder
+  l'accès au cours et vous reconnaître lors de vos visites.</li>
+  <li><strong>Enregistrement de l'achat</strong> : email, montant payé, date, canal de paiement —
+  conservé pour assurer votre accès et à des fins de comptabilité.</li>
+  <li><strong>Cookie de session</strong> : un cookie technique signé, contenant uniquement votre
+  email, qui permet de savoir que vous avez acheté l'accès pendant votre visite. Il expire à la
+  fermeture de votre navigateur.</li>
+</ul>
+<p>Nous ne collectons <strong>aucune donnée de carte bancaire</strong> : le paiement est traité
+intégralement par Paddle (voir section 3) — nous ne recevons ni ne stockons jamais votre numéro de
+carte ou vos informations de paiement.</p>
+<p>Aucun cookie publicitaire ou traceur d'analyse n'est utilisé actuellement sur ce site.</p>
+
+<h2>2. Durée de conservation</h2>
+<p>Ces données sont conservées tant que nécessaire pour vous fournir l'accès au cours. Il n'existe
+pas aujourd'hui d'outil de suppression automatique en libre-service ; pour toute demande de
+suppression ou d'accès à vos données, contactez-nous (section 5) et votre demande sera traitée
+manuellement.</p>
+
+<h2>3. Paiement — rôle de Paddle</h2>
+<p>Paddle (Paddle.com Market Ltd / Paddle.com Inc. selon votre juridiction) traite votre paiement en
+tant que revendeur officiel (Merchant of Record) et collecte à ce titre les données nécessaires au
+paiement (moyen de paiement, adresse de facturation le cas échéant). Ces données sont gérées
+directement par Paddle selon sa propre politique de confidentialité :
+<a href="https://www.paddle.com/legal/privacy" target="_blank" rel="noopener">paddle.com/legal/privacy</a>.</p>
+
+<h2>4. Vos droits</h2>
+<p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement et de
+portabilité sur vos données. Pour exercer l'un de ces droits, contactez-nous à l'adresse ci-dessous.</p>
+
+<h2>5. Contact</h2>
+<p><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
+</section>
+{% endblock %}

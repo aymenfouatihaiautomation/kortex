@@ -1,0 +1,110 @@
+<div class="chat-widget" id="chat-widget">
+  <button class="chat-toggle" id="chat-toggle" aria-label="Ouvrir le chat">💬</button>
+  <div class="chat-panel" id="chat-panel" hidden>
+    <div class="chat-panel-header">
+      <span>Assistant KORTEX</span>
+      <button class="chat-close" id="chat-close" aria-label="Fermer le chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-msg chat-msg-bot">Bonjour ! Je peux t'aider à trouver le bon cours ou répondre à tes questions sur nos formations. Que cherches-tu ?</div>
+    </div>
+    <div class="chat-error" id="chat-error" hidden></div>
+    <div class="chat-input-row">
+      <textarea id="chat-input" placeholder="Écris ton message..." maxlength="1000" rows="1"></textarea>
+      <button id="chat-send" class="btn btn-grad btn-sm" type="button">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var MAX_MESSAGES = 25;
+  var history = [];
+  var toggle = document.getElementById("chat-toggle");
+  var panel = document.getElementById("chat-panel");
+  var closeBtn = document.getElementById("chat-close");
+  var messagesEl = document.getElementById("chat-messages");
+  var input = document.getElementById("chat-input");
+  var sendBtn = document.getElementById("chat-send");
+  var errorEl = document.getElementById("chat-error");
+
+  toggle.addEventListener("click", function () {
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) input.focus();
+  });
+  closeBtn.addEventListener("click", function () {
+    panel.hidden = true;
+  });
+
+  function appendMessage(role, text) {
+    var div = document.createElement("div");
+    div.className = "chat-msg " + (role === "user" ? "chat-msg-user" : "chat-msg-bot");
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showError(text) {
+    errorEl.textContent = text;
+    errorEl.hidden = false;
+  }
+
+  async function sendMessage() {
+    var text = input.value.trim();
+    if (!text) return;
+    if (history.length >= MAX_MESSAGES) {
+      showError("Cette conversation a atteint sa longueur maximale. Rafraîchis la page pour en démarrer une nouvelle.");
+      return;
+    }
+
+    errorEl.hidden = true;
+    history.push({ role: "user", content: text });
+    appendMessage("user", text);
+    input.value = "";
+    input.disabled = true;
+    sendBtn.disabled = true;
+
+    var thinking = document.createElement("div");
+    thinking.className = "chat-msg chat-msg-bot chat-msg-loading";
+    thinking.textContent = "...";
+    messagesEl.appendChild(thinking);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    try {
+      var response = await fetch("/api/chat/general", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history }),
+      });
+      var data = await response.json().catch(function () {
+        return {};
+      });
+      thinking.remove();
+
+      if (!response.ok) {
+        history.pop();
+        showError(data.error || "Une erreur est survenue. Réessaie dans quelques instants.");
+      } else {
+        history.push({ role: "assistant", content: data.reply });
+        appendMessage("assistant", data.reply);
+      }
+    } catch (err) {
+      thinking.remove();
+      history.pop();
+      showError("Connexion impossible. Vérifie ta connexion et réessaie.");
+    } finally {
+      input.disabled = false;
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+})();
+</script>

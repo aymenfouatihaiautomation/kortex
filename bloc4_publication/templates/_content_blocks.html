@@ -1,0 +1,95 @@
+{# Rendu des content_blocks enrichis (Bloc 2 — mise en forme riche + schémas, sprint 2026-08-07).
+   Fichier autonome, non inclus par chapter.html tant que l'enrichissement n'est pas validé et
+   passé en production — voir docs/BLOC2_CONTENT_WRITING.md. #}
+{# Icônes façon Lucide (même famille visuelle que les schémas de la vidéo Bloc 3, qui utilisent
+   lucide-react) — SVG inline, aucune dépendance JS, une par style d'encadré. #}
+{% macro _callout_icon(style) %}
+{% if style == "warning" %}
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+{% elif style == "key_point" %}
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+{% elif style == "reminder" %}
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+{% elif style == "tip" %}
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg>
+{% endif %}
+{% endmacro %}
+{% macro render_content_blocks(blocks) %}
+{% for block in blocks %}
+{% if block.type == "paragraph" %}
+<p>{{ block.text|inline_emphasis }}</p>
+{% elif block.type == "heading" %}
+<h3 class="content-heading">{{ block.text }}</h3>
+{% elif block.type == "callout" %}
+<div class="callout callout-{{ block.style }}">
+  <span class="callout-icon">{{ _callout_icon(block.style) }}</span>
+  <div class="callout-body">
+    {% if block.title %}<div class="callout-title">{{ block.title }}</div>{% endif %}
+    <p>{{ block.text|inline_emphasis }}</p>
+  </div>
+</div>
+{% elif block.type == "code" %}
+<pre class="code-block"><code>{{ block.code }}</code></pre>
+{% elif block.type == "list" %}
+{% if block.style == "numbered" %}
+<ol class="content-list">{% for item in block["items"] %}<li>{{ item|inline_emphasis }}</li>{% endfor %}</ol>
+{% else %}
+<ul class="content-list">{% for item in block["items"] %}<li>{{ item|inline_emphasis }}</li>{% endfor %}</ul>
+{% endif %}
+{% elif block.type == "diagram" %}
+{% if block.diagram_type == "architecture" %}
+<div class="diagram diagram-architecture">
+  {% if block.title %}<div class="diagram-title">{{ block.title }}</div>{% endif %}
+  <div class="diagram-node diagram-node-hub">
+    <div class="diagram-node-label">{{ block.hub.label }}</div>
+    {% if block.hub.description %}<div class="diagram-node-desc">{{ block.hub.description }}</div>{% endif %}
+  </div>
+  <div class="diagram-connector-vertical"></div>
+  <div class="diagram-satellites">
+    {% for sat in block.satellites %}
+    <div class="diagram-satellite">
+      <div class="diagram-connector-up"></div>
+      <div class="diagram-node diagram-node-satellite">
+        <div class="diagram-node-label">{{ sat.label }}</div>
+        {% if sat.description %}<div class="diagram-node-desc">{{ sat.description }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% elif block.diagram_type in ("timeline", "flow") %}
+<div class="diagram diagram-{{ block.diagram_type }}">
+  {% if block.title %}<div class="diagram-title">{{ block.title }}</div>{% endif %}
+  <div class="diagram-steps">
+    {% for step in block.steps %}
+    <div class="diagram-step">
+      {% if block.diagram_type == "timeline" %}<div class="diagram-step-number">{{ step.number }}</div>{% endif %}
+      <div class="diagram-step-body">
+        <div class="diagram-step-label">{{ step.label }}</div>
+        {% if step.stat %}<div class="diagram-step-stat">{{ step.stat }}</div>{% endif %}
+        {% if step.description %}<div class="diagram-step-desc">{{ step.description }}</div>{% endif %}
+      </div>
+    </div>
+    {% if not loop.last %}<div class="diagram-arrow" aria-hidden="true">&rarr;</div>{% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% elif block.diagram_type == "comparison" %}
+<div class="diagram diagram-comparison">
+  {% if block.title %}<div class="diagram-title">{{ block.title }}</div>{% endif %}
+  <div class="diagram-comparison-grid">
+    <div class="diagram-comparison-col">
+      <div class="diagram-comparison-label">{{ block.left.label }}</div>
+      <ul>{% for p in block.left.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    </div>
+    <div class="diagram-comparison-vs">VS</div>
+    <div class="diagram-comparison-col diagram-comparison-right">
+      <div class="diagram-comparison-label">{{ block.right.label }}</div>
+      <ul>{% for p in block.right.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endmacro %}

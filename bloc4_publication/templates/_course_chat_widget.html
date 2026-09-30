@@ -1,0 +1,193 @@
+<div class="chat-widget" id="course-chat-widget">
+  <button class="chat-toggle" id="course-chat-toggle" aria-label="Ouvrir le tuteur">🎓</button>
+  <div class="chat-panel" id="course-chat-panel" hidden>
+    <div class="chat-panel-header">
+      <span>Tuteur du cours</span>
+      <div class="chat-header-actions">
+        <button class="chat-clear" id="course-chat-clear" type="button">Effacer la conversation</button>
+        <button class="chat-close" id="course-chat-close" aria-label="Fermer le tuteur">✕</button>
+      </div>
+    </div>
+    <div class="chat-messages" id="course-chat-messages">
+      <div class="chat-msg chat-msg-bot">Une question sur ce cours ? Je peux réexpliquer un concept, donner un exemple ou clarifier un point du chapitre.</div>
+    </div>
+    <div class="chat-error" id="course-chat-error" hidden></div>
+    <div class="chat-input-row">
+      <textarea id="course-chat-input" placeholder="Écris ta question..." maxlength="2000" rows="1"></textarea>
+      <button id="course-chat-send" class="chat-send" type="button">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var MAX_MESSAGES = 40;
+  var GREETING = "Une question sur ce cours ? Je peux réexpliquer un concept, donner un exemple ou clarifier un point du chapitre.";
+  var courseSlug = {{ course.slug|tojson }};
+  var userEmail = {{ email|default(none)|tojson }};
+  // Historique persisté côté navigateur UNIQUEMENT (localStorage) — le serveur reste sans état et
+  // reçoit toujours l'historique complet depuis le client à chaque appel (voir sendMessage
+  // ci-dessous). Clé indexée par utilisateur ET par cours : deux cours ne partagent jamais
+  // d'historique, et sur un navigateur partagé, deux comptes différents ne voient jamais la
+  // conversation l'un de l'autre.
+  var STORAGE_KEY = "tutor_history:" + (userEmail ? userEmail + ":" : "") + courseSlug;
+  var history = [];
+  var toggle = document.getElementById("course-chat-toggle");
+  var panel = document.getElementById("course-chat-panel");
+  var closeBtn = document.getElementById("course-chat-close");
+  var clearBtn = document.getElementById("course-chat-clear");
+  var messagesEl = document.getElementById("course-chat-messages");
+  var input = document.getElementById("course-chat-input");
+  var sendBtn = document.getElementById("course-chat-send");
+  var errorEl = document.getElementById("course-chat-error");
+
+  toggle.addEventListener("click", function () {
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) input.focus();
+  });
+  closeBtn.addEventListener("click", function () {
+    panel.hidden = true;
+  });
+
+  function isValidStoredHistory(value) {
+    if (!Array.isArray(value)) return false;
+    return value.every(function (m) {
+      return (
+        m &&
+        typeof m === "object" &&
+        (m.role === "user" || m.role === "assistant") &&
+        typeof m.content === "string" &&
+        m.content.length > 0
+      );
+    });
+  }
+
+  function loadStoredHistory() {
+    // try/catch : le mode privé (Safari) ou un quota localStorage plein peuvent faire lever une
+    // exception sur un simple accès — ça ne doit jamais casser le widget, juste repartir vide.
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      // JSON corrompu ou d'un format inattendu (ancienne version, donnée manipulée) : on l'ignore
+      // plutôt que de planter ou d'envoyer un historique invalide au serveur.
+      if (!isValidStoredHistory(parsed)) return [];
+      return parsed.slice(-MAX_MESSAGES);
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function saveHistory() {
+    try {
+      // Plafonné aux N derniers messages : sur une longue session, ne pas laisser le stockage
+      // grossir sans limite et finir par saturer le quota localStorage.
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(-MAX_MESSAGES)));
+    } catch (err) {
+      // Quota plein ou stockage indisponible : on continue sans persister, le widget reste
+      // pleinement fonctionnel pour la session en cours.
+    }
+  }
+
+  function resetToGreeting() {
+    messagesEl.innerHTML = "";
+    appendMessage("assistant", GREETING);
+  }
+
+  function appendMessage(role, text) {
+    var div = document.createElement("div");
+    div.className = "chat-msg " + (role === "user" ? "chat-msg-user" : "chat-msg-bot");
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showError(text) {
+    errorEl.textContent = text;
+    errorEl.hidden = false;
+  }
+
+  // Restauration au chargement de la page : si un historique valide existe pour ce cours (et cet
+  // utilisateur), on l'affiche à la place du message d'accueil statique.
+  history = loadStoredHistory();
+  if (history.length > 0) {
+    messagesEl.innerHTML = "";
+    history.forEach(function (m) {
+      appendMessage(m.role, m.content);
+    });
+  }
+
+  clearBtn.addEventListener("click", function () {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {
+      // Rien à faire de plus : même si la suppression échoue, on repart d'un état propre en
+      // mémoire ci-dessous.
+    }
+    history = [];
+    errorEl.hidden = true;
+    resetToGreeting();
+  });
+
+  async function sendMessage() {
+    var text = input.value.trim();
+    if (!text) return;
+    if (history.length >= MAX_MESSAGES) {
+      showError("Cette conversation a atteint sa longueur maximale. Rafraîchis la page pour en démarrer une nouvelle.");
+      return;
+    }
+
+    errorEl.hidden = true;
+    history.push({ role: "user", content: text });
+    appendMessage("user", text);
+    input.value = "";
+    input.disabled = true;
+    sendBtn.disabled = true;
+
+    var thinking = document.createElement("div");
+    thinking.className = "chat-msg chat-msg-bot chat-msg-loading";
+    thinking.textContent = "...";
+    messagesEl.appendChild(thinking);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    try {
+      var response = await fetch("/api/chat/course/" + encodeURIComponent(courseSlug), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history }),
+      });
+      var data = await response.json().catch(function () {
+        return {};
+      });
+      thinking.remove();
+
+      if (!response.ok) {
+        history.pop();
+        showError(data.error || "Une erreur est survenue. Réessaie dans quelques instants.");
+      } else {
+        history.push({ role: "assistant", content: data.reply });
+        appendMessage("assistant", data.reply);
+      }
+    } catch (err) {
+      thinking.remove();
+      history.pop();
+      showError("Connexion impossible. Vérifie ta connexion et réessaie.");
+    } finally {
+      // Un seul point de sauvegarde, après que `history` a atteint son état final (succès :
+      // question + réponse ajoutées ; échec : la question retirée par le rollback ci-dessus).
+      saveHistory();
+      input.disabled = false;
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+})();
+</script>

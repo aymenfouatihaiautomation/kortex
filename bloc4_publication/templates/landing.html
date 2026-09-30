@@ -1,0 +1,111 @@
+{% extends "base_marketing.html" %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<section class="hero-section compact">
+  <span class="glow glow-1"></span>
+  <span class="glow glow-2"></span>
+  <div class="wrap">
+    <p class="crumb"><a href="{{ url_for('home') }}">Accueil</a> / <a href="{{ url_for('catalog') }}">Cours</a> / {{ course.title }}</p>
+    <div class="hero-inner">
+      <div class="badge-row">
+        <span class="badge grad">{{ course.niche }}</span>
+        <span class="badge">Niveau {{ course.level }}</span>
+        <span class="badge">{{ course.chapters|length }} chapitres</span>
+      </div>
+      <h1 class="course-title">{{ course.title }}</h1>
+      <p class="course-desc">{{ course.description }}</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap content-grid">
+  <div>
+    <div class="section-block">
+      <span class="kicker">Prérequis</span>
+      <div class="prereq-card">
+        <strong>Prérequis :</strong> {{ course.prerequisites }}
+      </div>
+    </div>
+
+    <div class="section-block">
+      <span class="kicker">Ce que vous obtenez</span>
+      <h2>{{ course.chapters|length }} chapitres, chacun s'appuyant sur le précédent</h2>
+      <div class="chapter-grid">
+        {% for chapter in course.chapters %}
+        <div class="chapter-card{{ ' final' if chapter.is_final_project else '' }}">
+          {% if chapter.is_final_project %}<span class="final-tag">Projet final</span>{% endif %}
+          <div class="chapter-num">{{ chapter.number }}</div>
+          <h4>{{ chapter.title }}</h4>
+          <p>{{ chapter.learning_objectives[0] }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <ul style="list-style:none; padding:0; margin: 28px 0 0; display:flex; flex-direction:column; gap:10px; color:var(--text-muted); font-size:15px; max-width:740px;">
+        <li>Un exercice de compréhension et un exercice pratique à la fin de chaque chapitre</li>
+        <li>Un projet final intégrateur qui rassemble l'ensemble du programme</li>
+      </ul>
+
+      {% if course.chapters | selectattr("has_video") | list | length > 0 %}
+      <div class="bonus-note">
+        <span class="tag">Bonus</span>
+        Le chapitre 1 est disponible en vidéo, en plus du texte.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <aside class="buy-card">
+    <div class="price-big">{{ price }}</div>
+    <p class="price-cap">Achat unique · accès immédiat · pas d'abonnement</p>
+    {% if already_purchased %}
+    <a href="{{ continue_url }}" class="btn btn-grad btn-block">
+      Continuer le cours →
+    </a>
+    {% else %}
+    <form id="paddle-checkout-form" {% if not paddle_overlay_enabled %}action="{{ url_for('bloc5_payment.checkout_start') }}" method="get"{% endif %}>
+      <input type="hidden" name="slug" value="{{ course.slug }}">
+      <input type="email" id="paddle-checkout-email" name="email" placeholder="Votre email" required>
+      <button type="submit" class="btn btn-grad btn-block">Acheter le cours</button>
+    </form>
+    {% endif %}
+    <ul class="included with-border">
+      <li><span class="ck">✓</span> {{ course.chapters|length }} chapitres de leçons détaillées</li>
+      <li><span class="ck">✓</span> Exercices de compréhension par chapitre</li>
+      <li><span class="ck">✓</span> Un exercice pratique par chapitre</li>
+      <li><span class="ck">✓</span> Projet final intégrateur</li>
+      {% if course.chapters | selectattr("has_video") | list | length > 0 %}
+      <li><span class="ck">✓</span> Vidéo bonus au chapitre 1</li>
+      {% endif %}
+    </ul>
+  </aside>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if paddle_overlay_enabled and not already_purchased %}
+{# Overlay Paddle.js — requis par Paddle Billing (pas de page de paiement hébergée) : voir
+   bloc5_payment/config.py::paddle_overlay_enabled. Chargé UNIQUEMENT sur cette page (le seul
+   bouton d'achat du site), jamais sur home.html/catalog.html. En mock (token absent), ce bloc
+   entier est omis et le formulaire ci-dessus garde son comportement GET -> /checkout/start
+   d'origine, inchangé. Omis aussi pour un acheteur déjà connecté (already_purchased) : le
+   formulaire #paddle-checkout-form n'existe plus dans le DOM (remplacé par le lien "Accéder au
+   cours"), donc ce script planterait sur un getElementById(...) nul. #}
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script>
+  Paddle.Initialize({ token: "{{ paddle_client_token }}" });
+
+  document.getElementById("paddle-checkout-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var email = document.getElementById("paddle-checkout-email").value;
+    Paddle.Checkout.open({
+      items: [{ priceId: "{{ paddle_price_id }}", quantity: 1 }],
+      customer: { email: email },
+      settings: {
+        successUrl: window.location.origin + "/register?email=" + encodeURIComponent(email)
+      }
+    });
+  });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base_marketing.html" %}
+{% block title %}Mes cours{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Mon espace</span>
+      <h2>Mes cours</h2>
+      <p>{{ courses|length }} cours achetés.</p>
+    </div>
+
+    <div class="catalog-grid">
+      {% for course in courses %}
+      <a class="course-card" href="{{ url_for('course_landing', slug=course.slug) }}">
+        <h3>{{ course.title }}</h3>
+        <div class="meta-row">
+          <span>Continuer →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

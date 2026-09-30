@@ -1,0 +1,22 @@
+{
+  "name": "ai-edu-platform-video",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "render": "remotion render"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4",
+    "@remotion/transitions": "^4",
+    "lucide-react": "^0.400",
+    "react": "^18",
+    "react-dom": "^18",
+    "remotion": "^4",
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  }
+}

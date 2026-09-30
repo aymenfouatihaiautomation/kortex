@@ -1,0 +1,10 @@
+{% extends "base_reading.html" %}
+{% block title %}Attestation — {{ course.title }}{% endblock %}
+{% block content %}
+<div class="read-col">
+<span class="chapter-eyebrow">Attestation</span>
+<h1 class="chapter-title">Pas encore accessible</h1>
+<p class="dash-sub">Termine tous les chapitres (bouton « J'ai terminé ce chapitre » sur chacun) et réussis l'examen final (score minimum 70 %, réessais illimités) avant de générer ton attestation.</p>
+<a class="btn-reveal" href="{{ url_for('course_home') }}">Retour au cours</a>
+</div>
+{% endblock %}

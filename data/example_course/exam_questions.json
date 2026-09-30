@@ -1,0 +1,67 @@
+[
+  {
+    "id": "q1",
+    "chapter": 1,
+    "question": "Selon le contenu du chapitre, qu'est-ce qui distingue fondamentalement un agent IA d'une application logicielle traditionnelle en termes de surface d'attaque ?",
+    "options": [
+      "Un agent IA est simplement une application web comme les autres, avec des risques identiques",
+      "Un agent IA perçoit une entrée en langage naturel, raisonne, prend des décisions et agit potentiellement en appelant d'autres systèmes, ce qui en fait un 'distinct digital actor' avec autonomie décisionnelle",
+      "Un agent IA ne peut exécuter que des flux de code prédéfinis sans aucune capacité de raisonnement",
+      "Un agent IA n'a pas besoin de permissions d'accès puisqu'il ne contacte jamais d'autres systèmes"
+    ],
+    "correct_index": 1,
+    "explanation": "Le chapitre précise que 'Un agent IA moderne — pensez à notre fil rouge, cet agent qui traite les tickets de support client — n'exécute pas un simple flux de code prédéfini. Il perçoit une entrée en langage naturel, raisonne sur cette entrée, prend des décisions... et agit en conséquence'. Les experts parlent d'un agent IA comme d'un 'distinct digital actor' — un acteur numérique distinct, doté d'une forme d'autonomie décisionnelle."
+  },
+  {
+    "id": "q2",
+    "chapter": 1,
+    "question": "Quelle est la distinction fondamentale entre 'sécuriser une IA' et 'sécuriser avec l'IA' selon le cours ?",
+    "options": [
+      "Sécuriser une IA consiste à utiliser l'IA pour la détection d'anomalies, tandis que sécuriser avec l'IA revient à empêcher les injections de prompt",
+      "Sécuriser une IA signifie protéger le système d'IA lui-même contre les manipulations comme les injections de prompt, tandis que sécuriser avec l'IA désigne l'usage de l'IA comme outil de défense",
+      "Les deux concepts sont identiques et désignent la même approche de sécurité",
+      "Sécuriser une IA ne concerne que les données d'entraînement, tandis que sécuriser avec l'IA concerne uniquement les serveurs"
+    ],
+    "correct_index": 1,
+    "explanation": "Le chapitre établit clairement : 'Sécuriser une IA, c'est protéger le système d'IA lui-même contre des manipulations : empêcher qu'un attaquant ne détourne un chatbot via une prompt injection... Sécuriser avec l'IA, à l'inverse, désigne l'usage de l'IA comme outil de défense : détection d'anomalies par apprentissage automatique, analyse comportementale, réponse automatisée aux incidents.'"
+  },
+  {
+    "id": "q3",
+    "chapter": 1,
+    "question": "Quel problème de gouvernance IAM (Identity and Access Management) est spécifiquement soulevé par l'introduction des agents IA en entreprise ?",
+    "options": [
+      "Les agents IA n'ont pas besoin de gouvernance IAM puisqu'ils sont automatisés",
+      "L'IAM doit gérer une nouvelle troisième catégorie d'identités : des agents autonomes qui peuvent initier des actions dynamiquement, chaîner des appels à plusieurs systèmes, dont le comportement dépend d'entrées en langage naturel potentiellement manipulées",
+      "Les agents IA ne nécessitent que la même gestion IAM que les applications web classiques",
+      "La gouvernance IAM des agents IA se limite uniquement à la création de comptes utilisateur supplémentaires"
+    ],
+    "correct_index": 1,
+    "explanation": "Le chapitre explique : 'Historiquement, l'IAM gérait des identités humaines... et parfois des identités machine simples. Avec les agents IA, il faut désormais gérer une troisième catégorie d'identité : des agents qui peuvent initier des actions de façon dynamique, chaîner des appels à plusieurs systèmes, et dont le comportement dépend d'une entrée en langage naturel potentiellement manipulée par un attaquant.'"
+  },
+  {
+    "id": "q4",
+    "chapter": 1,
+    "question": "Selon les analyses du BCG 2025 mentionnées dans le chapitre, quel est le principal risque lié au 'Shadow AI' en entreprise ?",
+    "options": [
+      "Le Shadow AI ne constitue aucun risque réel pour la sécurité informatique",
+      "Le Shadow AI expose massivement les données d'entreprise à des fuites confidentielles, car il s'agit d'outils d'IA déployés hors gouvernance DSI/RSSI",
+      "Le Shadow AI n'affecte que les petites structures sans infrastructure IT",
+      "Le Shadow AI améliore automatiquement la sécurité en contournant les contrôles officiels"
+    ],
+    "correct_index": 1,
+    "explanation": "Le chapitre cite : 'Les travaux de BCG 2025 mettent en garde contre la généralisation d'outils d'IA déployés hors gouvernance DSI/RSSI, ce qui expose massivement les données d'entreprise à des fuites confidentielles.'"
+  },
+  {
+    "id": "q5",
+    "chapter": 1,
+    "question": "Pourquoi la prompt injection représente-t-elle un risque particulier pour un agent IA de support client selon le cours ?",
+    "options": [
+      "La prompt injection n'est un risque que pour les chatbots grand public, pas pour les agents métier",
+      "Un attaquant peut via une injection de prompt habile détourner l'agent pour révéler des informations confidentielles de la base de connaissances ou exécuter des actions non prévues, car l'agent prend des décisions basées sur des entrées en langage naturel potentiellement manipulées",
+      "La prompt injection est impossible à mettre en œuvre contre un agent d'entreprise correctement configuré",
+      "La prompt injection ne peut affecter que les données d'entraînement du modèle, pas son comportement opérationnel"
+    ],
+    "correct_index": 1,
+    "explanation": "Le chapitre explique le cas de l'agent de support : 'Peut-il, via une injection de prompt habile dans le message d'un client malveillant, être détourné pour révéler des informations confidentielles de la base de connaissances, ou pour exécuter une action non prévue ? C'est précisément ce type de lacune IAM — permissions trop larges, absence d'identité propre pour l'agent, absence de traçabilité de ses décisions — qui constitue aujourd'hui l'une des failles les plus critiques.'"
+  }
+]

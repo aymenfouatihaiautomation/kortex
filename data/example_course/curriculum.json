@@ -1,0 +1,30 @@
+{
+  "title": "Sécuriser les systèmes et agents IA en entreprise : Prompt Injection, Shadow AI et gouvernance IAM (2026)",
+  "niche": "Cybersecurity",
+  "level": "intermédiaire",
+  "prerequisites": "Avoir une expérience professionnelle en cybersécurité ou en administration de systèmes (notions d'IAM, de réseaux et de gestion des risques applicatifs) et comprendre le fonctionnement général des LLM et agents IA (prompts, API, orchestration) sans nécessairement maîtriser leur sécurisation.",
+  "source_topic": {
+    "title": "Sécurisation des systèmes et agents IA : Prompt Injection, Shadow AI et gouvernance IAM des agents (2026)",
+    "gap_reason": "Les recherches confirment une demande réelle et actuelle, portée par plusieurs signaux convergents. Le rapport Google Cloud Cybersecurity Forecast 2026 place la prompt injection et l'AI-Enabled Social Engineering en tête des menaces, en précisant qu'il s'agit d'un 'critical and growing threat' qui va connaître 'a significant rise in targeted attacks on enterprise AI systems'. Le rapport insiste aussi sur le besoin d'un 'AI Agent Paradigm Shift' nécessitant une évolution de l'IAM pour traiter les agents IA comme des 'distinct digital actors with their own managed identities', ce qui est confirmé par CSO Online notant que l'IAM est devenu la 6e priorité des CISOs pour 2026 avec un besoin de gérer 'not just human identities but thing identities as well'. Côté données chiffrées, l'étude BCG 2025 est vérifiée : 80% des CISOs citent les cyberattaques boostées par l'IA comme préoccupation n°1, une hausse de 19 points par rapport à l'année précédente. TechTarget confirme également que les CISOs orientent désormais leurs priorités 2026 vers la sécurisation de leurs propres déploiements IA, en plus de la défense contre les attaques IA. Enfin, la littérature francophone (Journal du Net, Forum des Compétences, cabinets de conseil spécialisés) montre une appropriation croissante du sujet en France avec des cas concrets (bot RH McDonald's, agents IA en banque/assurance), mais l'offre de formation françaphone structurée et à jour sur ce triptyque précis (prompt injection + shadow AI + IAM pour agents IA) reste peu développée comparée à l'offre anglophone (cours OWASP LLM Top 10, certifications CAISP), ce qui constitue une opportunité claire pour un cours FR sur ce sujet précis et d'actualité."
+  },
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Panorama des menaces IA en 2026 : pourquoi les systèmes et agents IA changent la donne en cybersécurité",
+      "learning_objectives": [
+        "Expliquer pourquoi les agents IA constituent une nouvelle surface d'attaque distincte des applications traditionnelles",
+        "Situer la prompt injection, le Shadow AI et les lacunes IAM dans le paysage des risques cyber 2026 avec des données chiffrées récentes"
+      ],
+      "key_points": [
+        "Chiffres clés BCG 2025 et Google Cloud Cybersecurity Forecast 2026 sur les cybermenaces liées à l'IA",
+        "Différence entre sécuriser une IA (defense) et sécuriser avec l'IA (attaques assistées par IA)",
+        "Notion d'agent IA comme \"distinct digital actor\" et paradigme IAM associé",
+        "Panorama des cas concrets francophones (bot RH McDonald's, agents en banque/assurance)"
+      ],
+      "builds_on_previous": "N/A - premier chapitre",
+      "format": "text",
+      "format_reasoning": "Ce chapitre pose un cadre conceptuel et statistique de référence à consulter et relire, sans manipulation technique à démontrer visuellement."
+    }
+  ],
+  "generated_at": "2026-08-26T18:16:03.075769+00:00"
+}

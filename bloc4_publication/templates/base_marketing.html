@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}KORTEX{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/marketing.css') }}">
+</head>
+<body>
+  <header class="site-nav">
+    <div class="wrap nav-row">
+      <a class="wordmark" href="{{ url_for('home') }}"><span class="mark"></span>KORTE<span class="brand-x">X</span></a>
+      <nav class="links">
+        <a href="{{ url_for('home') }}" class="{{ 'current' if request.endpoint == 'home' else '' }}">Accueil</a>
+        <a href="{{ url_for('catalog') }}" class="{{ 'current' if request.endpoint in ('catalog', 'course_landing') else '' }}">Cours</a>
+        <a href="{{ url_for('about') }}" class="{{ 'current' if request.endpoint == 'about' else '' }}">À propos</a>
+      </nav>
+      <div class="nav-cta">
+        {% if session.get('email') %}
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('course_home') }}">Mon cours</a>
+        <form method="post" action="{{ url_for('accounts.logout') }}" class="nav-logout-form">
+          <button type="submit" class="btn btn-ghost btn-sm">Déconnexion</button>
+        </form>
+        {% else %}
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('accounts.login') }}">Se connecter</a>
+        <a class="btn btn-grad btn-sm" href="{{ url_for('catalog') }}">Voir les cours</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="wordmark" href="{{ url_for('home') }}"><span class="mark"></span>KORTE<span class="brand-x">X</span></a>
+        <p class="footer-note">Édité par Aymene Ahmed Fouatih, à titre individuel.</p>
+      </div>
+      <div class="footer-links">
+        <a href="{{ url_for('terms') }}">Conditions d'utilisation</a>
+        <a href="{{ url_for('privacy') }}">Confidentialité</a>
+        <a href="{{ url_for('refunds') }}">Remboursement</a>
+        <a href="mailto:{{ contact_email }}">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  {% if request.endpoint in ('home', 'catalog') %}
+  {% include "_chat_widget.html" %}
+  {% endif %}
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

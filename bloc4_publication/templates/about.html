@@ -1,0 +1,31 @@
+{% extends "base_marketing.html" %}
+{% block title %}À propos{% endblock %}
+{% block content %}
+<section class="wrap prose">
+  <h1>À propos</h1>
+  <p>
+    Ce site est édité par <strong>Aymene Ahmed Fouatih</strong>, à titre individuel. Il publie des
+    cours en ligne construits autour d'une méthode simple : partir d'un vrai manque constaté dans
+    ce qui existe déjà, plutôt que d'un sujet choisi parce qu'il est à la mode.
+  </p>
+
+  <h2>La méthode</h2>
+  <p>
+    Chaque cours suit le même processus, quel que soit le domaine — technique, business, créatif ou
+    autre : identifier un sujet où le contenu existant est insuffisant, construire un programme
+    progressif où chaque chapitre s'appuie sur le précédent, puis faire relire le contenu par un
+    contrôle qualité indépendant avant toute publication.
+  </p>
+
+  <h2>Un catalogue qui grandit</h2>
+  <p>
+    Un seul cours est publié aujourd'hui. D'autres suivront, sur des sujets différents, toujours
+    avec la même exigence de méthode plutôt qu'un objectif de volume.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Pour toute question : <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.
+  </p>
+</section>
+{% endblock %}

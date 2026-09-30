@@ -1,0 +1,30 @@
+{% extends "base_marketing.html" %}
+{% block title %}Cours{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Catalogue</span>
+      <h2>Nos cours</h2>
+      <p>{{ courses|length }} cours publié{{ "s" if courses|length > 1 else "" }} pour l'instant — chaque nouveau cours suit la même méthode avant d'être publié.</p>
+    </div>
+
+    <div class="catalog-grid">
+      {% for course in courses %}
+      <a class="course-card" href="{{ url_for('course_landing', slug=course.slug) }}">
+        <div class="badge-row">
+          <span class="badge grad">{{ course.niche }}</span>
+          <span class="badge">Niveau {{ course.level }}</span>
+        </div>
+        <h3>{{ course.title }}</h3>
+        <p class="desc">{{ course.description }}</p>
+        <div class="meta-row">
+          <span class="price-tag">{{ course.chapters|length }} chapitres</span>
+          <span>Voir le programme →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

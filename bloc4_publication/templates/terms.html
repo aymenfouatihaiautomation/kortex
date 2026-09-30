@@ -1,0 +1,40 @@
+{% extends "base_marketing.html" %}
+{% block title %}Conditions d'utilisation{% endblock %}
+{% block content %}
+<section class="wrap prose">
+<h1>Conditions d'utilisation</h1>
+<p><em>Dernière mise à jour : 2026-08-02.</em></p>
+
+<p><strong>Éditeur du site :</strong> Ce service est édité par Aymene Ahmed Fouatih, à titre
+individuel — contact : <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+
+<h2>1. Nature du produit</h2>
+<p>Ce site propose l'accès à un cours en ligne au format numérique (leçons écrites, exercices
+pratiques, et vidéo pour les chapitres qui en disposent — voir la page d'accueil pour l'état actuel
+de la disponibilité vidéo par chapitre). Il ne s'agit pas d'un abonnement : l'achat est
+<strong>unique et non récurrent</strong>, aucun paiement automatique ultérieur n'est prélevé.</p>
+
+<h2>2. Accès au cours</h2>
+<p>Après confirmation du paiement, un lien d'accès personnel et unique vous est fourni pour
+consulter le cours. Ce lien est destiné à un usage strictement personnel : il ne doit pas être
+partagé ni revendu.</p>
+
+<h2>3. Contenu du cours</h2>
+<p>Le contenu du cours peut évoluer dans le temps (corrections, ajout progressif de vidéos pour les
+chapitres qui n'en disposent pas encore au moment de votre achat). L'accès déjà accordé reste valable
+pour la durée de vie du cours.</p>
+
+<h2>4. Paiement</h2>
+<p>Les paiements sont traités par <strong>Paddle</strong> (Paddle.com Market Ltd ou l'entité Paddle
+compétente selon votre juridiction), qui agit en tant que revendeur officiel
+(<em>Merchant of Record</em>) de ce produit. Paddle gère la facturation, la TVA/les taxes
+applicables, et peut apparaître comme le vendeur sur votre relevé bancaire.</p>
+
+<h2>5. Remboursement</h2>
+<p>Voir notre <a href="{{ url_for('refunds') }}">politique de remboursement</a>.</p>
+
+<h2>6. Contact</h2>
+<p>Pour toute question sur ces conditions :
+<a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+</section>
+{% endblock %}

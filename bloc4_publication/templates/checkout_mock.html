@@ -1,0 +1,20 @@
+{% extends "base_marketing.html" %}
+{% block title %}Paiement{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="simple-card">
+    <h1>Paiement (mode test)</h1>
+    <p>Cette page simule la page de paiement hébergée par Paddle. En production réelle, le client
+    saisirait ses informations de paiement directement chez Paddle, pas ici.</p>
+    <form method="post" action="{{ url_for('bloc5_payment.checkout_mock_complete', transaction_id=transaction_id) }}">
+      <input type="hidden" name="email" value="{{ email }}">
+      <p>Email : <strong>{{ email }}</strong></p>
+      {% if amount_usd is not none %}
+      <p>Montant : <strong>${{ "%.2f"|format(amount_usd) }}</strong></p>
+      {% endif %}
+      <p>Transaction (test) : <code>{{ transaction_id }}</code></p>
+      <button type="submit" class="btn btn-grad btn-block">Simuler un paiement réussi</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

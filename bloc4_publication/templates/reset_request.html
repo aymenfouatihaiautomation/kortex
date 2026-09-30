@@ -1,0 +1,23 @@
+{% extends "base_marketing.html" %}
+{% block title %}Mot de passe oublié{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="simple-card">
+    <h1>Mot de passe oublié</h1>
+    {% if not message %}
+    <p>Indique ton email : si un compte existe, un lien de réinitialisation te sera envoyé.</p>
+    {% endif %}
+    {% if message %}<div class="auth-message success">{{ message }}</div>{% endif %}
+    {% if error %}<div class="auth-message error">{{ error }}</div>{% endif %}
+    {% if not message %}
+    <form method="post" action="{{ url_for('accounts.reset_password_request') }}">
+      <input type="email" name="email" placeholder="Ton email" required autofocus>
+      <button type="submit" class="btn btn-grad btn-block">Envoyer le lien</button>
+    </form>
+    {% endif %}
+    <div class="auth-links">
+      <a href="{{ url_for('accounts.login') }}">Retour à la connexion</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

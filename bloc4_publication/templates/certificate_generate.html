@@ -1,0 +1,16 @@
+{% extends "base_reading.html" %}
+{% block title %}Générer mon attestation{% endblock %}
+{% block content %}
+<div class="read-col">
+<span class="chapter-eyebrow">Attestation</span>
+<h1 class="chapter-title">Générer mon attestation</h1>
+<p class="dash-sub">Félicitations pour avoir terminé <strong>{{ course.title }}</strong> ! Indique le nom à afficher sur ton attestation — il apparaîtra sur le PDF et sur la page de vérification publique.</p>
+
+{% if error %}<div class="llm-feedback error">{{ error }}</div>{% endif %}
+
+<form method="post" class="certificate-form">
+  <input type="text" name="learner_name" placeholder="Ton nom complet" value="{{ learner_name or '' }}" required autofocus maxlength="255">
+  <button type="submit" class="btn-reveal">Générer le PDF</button>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base_marketing.html" %}
+{% block title %}Paiement confirmé{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="simple-card">
+    <h1>Paiement confirmé</h1>
+    <p>Accès accordé à <strong>{{ email }}</strong>{% if amount_usd is not none %} (${{ "%.2f"|format(amount_usd) }}){% endif %}.</p>
+    <a class="btn btn-grad" href="{{ access_url }}">Accéder au cours</a>
+  </div>
+</div>
+{% endblock %}

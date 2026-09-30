@@ -1,0 +1,41 @@
+# Blueprint Render — LMS (Bloc 4 publication + Bloc 5 paiement Paddle).
+#
+# Déploiement : connecter ce dépôt sur https://dashboard.render.com/blueprints ("New +" -> "Blueprint").
+# Les variables marquées `sync: false` doivent être saisies manuellement dans le dashboard Render
+# après la création du service (jamais commitées ici) — voir docs/DEPLOYMENT.md pour la liste
+# exacte et où récupérer chaque valeur.
+services:
+  - type: web
+    name: ai-edu-platform-lms
+    runtime: python
+    plan: starter  # tier payant — jamais "free" (mise en veille incompatible avec un webhook Paddle fiable)
+    region: frankfurt
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /
+    disk:
+      name: lms-state
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: LMS_STATE_DIR
+        value: /var/data
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: PADDLE_API_KEY
+        sync: false
+      - key: PADDLE_WEBHOOK_SECRET
+        sync: false
+      - key: PADDLE_PRODUCT_ID
+        sync: false
+      - key: PADDLE_PRICE_ID
+        sync: false
+      - key: PADDLE_CLIENT_TOKEN
+        sync: false
+      - key: PADDLE_API_BASE
+        value: https://api.paddle.com

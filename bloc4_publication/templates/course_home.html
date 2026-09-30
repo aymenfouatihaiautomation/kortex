@@ -1,0 +1,41 @@
+{% extends "base_reading.html" %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<span class="chapter-eyebrow">Votre cours</span>
+<h1 class="dash-title">{{ course.title }}</h1>
+<p class="dash-sub">Choisissez un chapitre pour commencer. Les chapitres s'appuient les uns sur les
+autres : une progression dans l'ordre est recommandée.</p>
+
+{% if exam_ready and not certificate_ready %}
+<div class="certificate-banner">
+  <div>
+    <strong>📝 Tous les chapitres sont terminés !</strong>
+    <p>Réussis l'examen final (score minimum 70 %, réessais illimités) pour débloquer ton attestation.</p>
+  </div>
+  <a class="btn-reveal" href="{{ url_for('exam.take', slug=course.slug) }}">Passer l'examen final</a>
+</div>
+{% endif %}
+
+{% if certificate_ready %}
+<div class="certificate-banner">
+  <div>
+    <strong>🎉 Cours terminé et examen réussi !</strong>
+    <p>Génère ton attestation de réussite.</p>
+  </div>
+  <a class="btn-reveal" href="{{ url_for('certificates.generate', slug=course.slug) }}">Générer mon attestation</a>
+</div>
+{% endif %}
+
+<div class="chapter-dash-grid">
+  {% for chap in course.chapters %}
+  <a class="chapter-dash-card" href="{{ url_for('chapter', number=chap.number) }}">
+    <span class="num">{{ chap.number }}</span>
+    <div>
+      <h3>{{ chap.title }}</h3>
+      <p>{{ chap.learning_objectives[0] }}</p>
+      {% if chap.has_video %}<span class="video-pill">Vidéo incluse</span>{% endif %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

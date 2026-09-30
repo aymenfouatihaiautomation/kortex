@@ -1,0 +1,23 @@
+{
+  "MAX_COURSES_PER_DAY": 2,
+  "MIN_HOURS_BETWEEN_COURSES": 12,
+  "DOMAINS_ENABLED": [
+    "Finance personnelle",
+    "Ressources Humaines",
+    "Marketing digital",
+    "Excel avancé",
+    "Droit du travail",
+    "Comptabilité",
+    "Développement personnel",
+    "Data pour managers",
+    "Négociation",
+    "Gestion de projet",
+    "Vente",
+    "Immobilier",
+    "Entrepreneuriat",
+    "Communication",
+    "Leadership"
+  ],
+  "AUTO_SELECT_TOPIC": true,
+  "MAX_VALIDATION_HOURS": 2
+}

@@ -1,0 +1,27 @@
+{% extends "base_marketing.html" %}
+{% block title %}Politique de remboursement{% endblock %}
+{% block content %}
+<section class="wrap prose">
+<h1>Politique de remboursement</h1>
+<p><em>Dernière mise à jour : 2026-08-02.</em></p>
+
+<h2>Produit numérique à accès immédiat</h2>
+<p>Ce cours est un produit numérique : l'accès est accordé immédiatement après confirmation du
+paiement.</p>
+
+<h2>Délai et conditions</h2>
+<p>Vous pouvez demander un remboursement intégral dans les <strong>14 jours</strong> suivant votre
+achat, sans justification, par simple email à
+<a href="mailto:{{ contact_email }}">{{ contact_email }}</a>. Passé ce délai, les achats ne sont
+plus remboursables.</p>
+
+<h2>Comment le remboursement est traité</h2>
+<p>Les paiements étant traités par Paddle (notre revendeur officiel), le remboursement est effectué
+par Paddle sur le moyen de paiement utilisé lors de l'achat, dans les délais habituels de votre
+banque (généralement quelques jours ouvrés).</p>
+
+<h2>Contact</h2>
+<p>Pour toute demande de remboursement :
+<a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+</section>
+{% endblock %}

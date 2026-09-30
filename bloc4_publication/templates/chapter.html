@@ -1,0 +1,154 @@
+{% extends "base_reading.html" %}
+{% import "_content_blocks.html" as content_blocks_macros %}
+{% block title %}Chapitre {{ chapter.number }} — {{ chapter.title }}{% endblock %}
+{% block progress %}
+<div class="progress-band">
+  <div class="wrap progress-row">
+    <span class="progress-label">Chapitre {{ chapter.number }} / {{ course.chapters|length }}</span>
+    <div class="progress-track">
+      {% for c in course.chapters %}
+      <span class="progress-seg{{ ' done' if c.number <= chapter.number else '' }}"></span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="read-col">
+<span class="chapter-eyebrow">Chapitre {{ chapter.number }}</span>
+<h1 class="chapter-title">{{ chapter.title }}</h1>
+
+{% set chapter_format = chapter.format or "text" %}
+
+{% if chapter.has_video %}
+<div class="video-block">
+  <video controls width="100%" src="{{ url_for('chapter_1_video') }}"></video>
+</div>
+{% elif chapter_format in ("video", "mix") %}
+  {# Pas d'asset vidéo réel pour l'instant (Bloc 3 mis de côté) : emplacement honnête, jamais une
+     zone vide — le contenu écrit complet ci-dessous reste TOUJOURS disponible, voir .lesson-text. #}
+<div class="video-placeholder">
+  <div class="video-placeholder-icon" aria-hidden="true">🎬</div>
+  <div class="video-placeholder-body">
+    <div class="video-placeholder-title">Vidéo à venir</div>
+    <p class="video-placeholder-text">La vidéo de ce chapitre arrive prochainement. En attendant, le contenu écrit ci-dessous couvre l'intégralité du sujet.</p>
+  </div>
+</div>
+  {% if chapter.video_script %}
+  <div class="video-script-preview">
+    <div class="video-script-preview-label">Aperçu du plan de la vidéo</div>
+    {% if chapter.video_script.summary %}<p class="video-script-summary">{{ chapter.video_script.summary }}</p>{% endif %}
+    <ol class="video-script-scenes">
+      {% for scene in chapter.video_script.scenes %}
+      <li>
+        <span class="video-script-beat">{{ scene.beat }}</span>
+        <span class="video-script-narration">{{ scene.narration }}</span>
+        {% if scene.visual %}<span class="video-script-visual">{{ scene.visual }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+{% endif %}
+{# format "text" (ou champ absent) sans asset vidéo réel : AUCUN encadré vidéo — ce format signifie
+   qu'aucune vidéo n'est prévue pour ce chapitre, contrairement à "video"/"mix" où elle est promise
+   à venir. Afficher un message "vidéo bientôt disponible" contredirait ce choix éditorial explicite. #}
+
+<div class="lesson-text">
+  {# Priorité d'affichage : le meilleur contenu écrit disponible s'affiche TOUJOURS, quel que soit
+     le format — jamais laisser l'apprenant sans contenu tant qu'aucune vidéo réelle n'existe. #}
+  {% if chapter.content_blocks %}
+  {{ content_blocks_macros.render_content_blocks(chapter.content_blocks) }}
+  {% elif chapter.lesson_script %}
+  {% for para in chapter.lesson_script|paragraphs %}
+  <p>{{ para }}</p>
+  {% endfor %}
+  {% elif chapter.written_complement %}
+  <p class="written-complement">{{ chapter.written_complement }}</p>
+  {% endif %}
+</div>
+
+<div class="section-divider"><span class="tag">Exercices</span><span class="line"></span></div>
+{% for ex in chapter.comprehension_exercises %}
+{% if ex.type == "mcq" and ex.options %}
+<div class="exercise-card" data-explanation="{{ ex.explanation|default('', true) }}" data-chapter="{{ chapter.number }}" data-exercise-index="{{ loop.index0 }}">
+  <p class="q">{{ loop.index }}. {{ ex.question }}</p>
+  <div class="opt-list">
+    {% for opt in ex.options %}
+    <button type="button" class="opt" data-correct="{{ 'true' if opt == ex.correct_answer else 'false' }}" onclick="selectMcqOption(this)">{{ opt }}</button>
+    {% endfor %}
+  </div>
+  <div class="exercise-feedback" data-role="feedback" hidden></div>
+</div>
+{% else %}
+<div class="exercise-card" data-chapter="{{ chapter.number }}" data-exercise-index="{{ loop.index0 }}" data-remaining="{{ max_corrections }}">
+  <p class="q">{{ loop.index }}. {{ ex.question }}</p>
+  <textarea class="short-answer-input" data-role="learner-answer" maxlength="{{ max_answer_length }}" placeholder="Écrivez votre réponse ici..."></textarea>
+  <div class="short-answer-actions">
+    <button type="button" class="btn-reveal" data-role="correct-btn" onclick="correctShortAnswer(this)">Corriger</button>
+    <span class="correction-remaining" data-role="remaining-label">{{ max_corrections }} corrections restantes</span>
+  </div>
+  <div class="llm-feedback" data-role="llm-feedback" hidden></div>
+</div>
+{% endif %}
+{% endfor %}
+
+<div class="section-divider"><span class="tag">{{ "Projet final" if chapter.is_final_project else "Exercice pratique" }}</span><span class="line"></span></div>
+<div class="practical-card">
+  <h3>{{ chapter.practical_exercise.title }}</h3>
+  <p>{{ chapter.practical_exercise.instructions }}</p>
+  <h4>Résultat attendu</h4>
+  <p>{{ chapter.practical_exercise.expected_outcome }}</p>
+
+  {% if chapter.is_final_project %}
+  <h4>Livrables</h4>
+  <ul>{% for d in chapter.practical_exercise.deliverables %}<li>{{ d }}</li>{% endfor %}</ul>
+  <h4>Étapes</h4>
+  <ol>{% for s in chapter.practical_exercise.step_by_step_instructions %}<li>{{ s }}</li>{% endfor %}</ol>
+  <h4>Critères d'évaluation</h4>
+  <ul>{% for e in chapter.practical_exercise.evaluation_criteria %}<li>{{ e }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <div class="practical-submit" data-chapter="{{ chapter.number }}" data-remaining="{{ max_corrections }}">
+    <h4>Soumettre pour correction</h4>
+    <textarea class="short-answer-input" data-role="practical-answer" maxlength="{{ max_practical_length }}" placeholder="Collez votre solution (texte ou code) ici..."></textarea>
+    <div class="file-upload-row">
+      <label class="file-upload-btn">
+        <input type="file" data-role="practical-file" accept="{{ accepted_upload_extensions }}" onchange="onPracticalFileSelected(this)" hidden>
+        📎 Joindre un fichier (optionnel)
+      </label>
+      <span class="file-name" data-role="practical-filename"></span>
+    </div>
+    <div class="short-answer-actions">
+      <button type="button" class="btn-reveal" data-role="practical-correct-btn" onclick="correctPracticalExercise(this)">Corriger</button>
+      <span class="correction-remaining" data-role="practical-remaining-label">{{ max_corrections }} corrections restantes</span>
+    </div>
+    <div class="llm-feedback" data-role="practical-feedback" hidden></div>
+  </div>
+</div>
+
+{% if chapter_progress is defined %}
+<div class="chapter-complete-block" data-chapter="{{ chapter.number }}">
+  {% if chapter_progress.chapter_marked_complete %}
+  <p class="chapter-complete-done">✅ Chapitre marqué comme terminé.</p>
+  {% else %}
+  <button type="button" class="btn-reveal" data-role="complete-chapter-btn" onclick="completeChapter(this)" {{ "disabled" if not chapter_progress.ready else "" }}>J'ai terminé ce chapitre</button>
+  <p class="chapter-complete-hint" data-role="complete-chapter-hint" {{ "hidden" if chapter_progress.ready else "" }}>{% if chapter_progress.missing %}Il reste à répondre : {{ chapter_progress.missing|join(", ") }}.{% endif %}</p>
+  <div class="llm-feedback" data-role="complete-chapter-feedback" hidden></div>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if chapter.is_final_project and exam_ready is defined and exam_ready %}
+<div class="chapter-complete-block">
+  <p class="chapter-complete-done">🎉 Cours terminé ! Tu peux maintenant passer l'examen final.</p>
+  <a class="btn-reveal" href="{{ url_for('exam.take', slug=course.slug) }}">Passer l'examen final</a>
+</div>
+{% endif %}
+
+<div class="chapter-nav">
+  {% if prev_number %}<a class="nav-link prev" href="{{ url_for('chapter', number=prev_number) }}"><span class="dir">&larr; Précédent</span><span class="ttl">Chapitre {{ prev_number }}</span></a>{% else %}<span class="nav-link-spacer"></span>{% endif %}
+  {% if next_number %}<a class="nav-link next" href="{{ url_for('chapter', number=next_number) }}"><span class="dir">Suivant &rarr;</span><span class="ttl">Chapitre {{ next_number }}</span></a>{% endif %}
+</div>
+</div>
+{% endblock %}

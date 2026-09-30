@@ -1,0 +1,73 @@
+{% extends "base_reading.html" %}
+{% import "_content_blocks.html" as content_blocks_macros %}
+{% block title %}Chapitre {{ chapter.number }} — {{ chapter.title }}{% endblock %}
+{% block progress %}
+<div class="progress-band">
+  <div class="wrap progress-row">
+    <span class="progress-label">Chapitre {{ chapter.number }} / {{ course.chapters|length }}</span>
+    <div class="progress-track">
+      {% for c in course.chapters %}
+      <span class="progress-seg{{ ' done' if c.number <= chapter.number else '' }}"></span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="read-col">
+<span class="chapter-eyebrow">Chapitre {{ chapter.number }}</span>
+<h1 class="chapter-title">{{ chapter.title }}</h1>
+
+{% set chapter_format = chapter.format or "text" %}
+
+{# Pas de bloc vidéo réelle ici (contrairement à chapter.html) : chapter_1_video() sert le fichier
+   du cours 1 uniquement — aucun asset vidéo générique par slug n'existe. Le format "video"/"mix"
+   garde son placeholder (décoratif, aucune route hardcodée), le contenu écrit reste toujours
+   affiché ci-dessous. #}
+{% if chapter_format in ("video", "mix") %}
+<div class="video-placeholder">
+  <div class="video-placeholder-icon" aria-hidden="true">🎬</div>
+  <div class="video-placeholder-body">
+    <div class="video-placeholder-title">Vidéo à venir</div>
+    <p class="video-placeholder-text">La vidéo de ce chapitre arrive prochainement. En attendant, le contenu écrit ci-dessous couvre l'intégralité du sujet.</p>
+  </div>
+</div>
+  {% if chapter.video_script %}
+  <div class="video-script-preview">
+    <div class="video-script-preview-label">Aperçu du plan de la vidéo</div>
+    {% if chapter.video_script.summary %}<p class="video-script-summary">{{ chapter.video_script.summary }}</p>{% endif %}
+    <ol class="video-script-scenes">
+      {% for scene in chapter.video_script.scenes %}
+      <li>
+        <span class="video-script-beat">{{ scene.beat }}</span>
+        <span class="video-script-narration">{{ scene.narration }}</span>
+        {% if scene.visual %}<span class="video-script-visual">{{ scene.visual }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+{% endif %}
+
+<div class="lesson-text">
+  {% if chapter.content_blocks %}
+  {{ content_blocks_macros.render_content_blocks(chapter.content_blocks) }}
+  {% elif chapter.lesson_script %}
+  {% for para in chapter.lesson_script|paragraphs %}
+  <p>{{ para }}</p>
+  {% endfor %}
+  {% elif chapter.written_complement %}
+  <p class="written-complement">{{ chapter.written_complement }}</p>
+  {% endif %}
+</div>
+
+{# Volontairement aucun bloc exercices/pratique/complétion ici — voir le commentaire sur
+   app.py::course_chapter pour pourquoi (JS de base_reading.html câblé sur les routes /chapter/<n>
+   du cours 1, réutiliser ces blocs casserait ou fausserait la progression pour un autre cours). #}
+
+<div class="chapter-nav">
+  {% if prev_number %}<a class="nav-link prev" href="{{ url_for('course_chapter', slug=course.slug, number=prev_number) }}"><span class="dir">&larr; Précédent</span><span class="ttl">Chapitre {{ prev_number }}</span></a>{% else %}<span class="nav-link-spacer"></span>{% endif %}
+  {% if next_number %}<a class="nav-link next" href="{{ url_for('course_chapter', slug=course.slug, number=next_number) }}"><span class="dir">Suivant &rarr;</span><span class="ttl">Chapitre {{ next_number }}</span></a>{% endif %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base_marketing.html" %}
+{% block title %}Se connecter{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="simple-card">
+    <h1>Se connecter</h1>
+    {% if request.args.get('reset') %}<div class="auth-message success">Mot de passe mis à jour — tu peux te reconnecter.</div>{% endif %}
+    {% if error %}<div class="auth-message error">{{ error }}</div>{% endif %}
+    {% if google_enabled %}
+    <a class="btn-google" href="{{ url_for('accounts.login_google', next=next) if next else url_for('accounts.login_google') }}">
+      <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9C16.64 14.2 17.64 11.9 17.64 9.2Z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.55-1.84.87-3.06.87-2.36 0-4.36-1.6-5.08-3.75H.9v2.33A9 9 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.92 10.68A5.4 5.4 0 0 1 3.64 9c0-.58.1-1.15.28-1.68V4.99H.9A9 9 0 0 0 0 9c0 1.45.35 2.83.9 4.01l3.02-2.33Z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58A9 9 0 0 0 .9 4.99l3.02 2.33C4.64 5.18 6.64 3.58 9 3.58Z"/></svg>
+      Continuer avec Google
+    </a>
+    <div class="auth-divider"><span>ou</span></div>
+    {% endif %}
+    <form method="post" action="{{ url_for('accounts.login') }}">
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <input type="email" name="email" placeholder="Ton email" value="{{ email or '' }}" required autofocus>
+      <input type="password" name="password" placeholder="Mot de passe" required>
+      <button type="submit" class="btn btn-grad btn-block">Se connecter</button>
+    </form>
+    <div class="auth-links">
+      <a href="{{ url_for('accounts.reset_password_request') }}">Mot de passe oublié ?</a>
+      <a href="{{ url_for('accounts.register', next=next) if next else url_for('accounts.register') }}">Créer un compte</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

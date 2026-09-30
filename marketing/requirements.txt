@@ -1,0 +1,12 @@
+# Dépendances du système marketing KORTEX (marketing/) — isolé de requirements.txt racine,
+# n'affecte pas le LMS/pipeline existants.
+#
+# anthropic, requests, python-dotenv sont deja utilises par le reste du depot (voir
+# requirements.txt racine) et donc deja installes dans le venv partage ; listes ici quand meme
+# pour que marketing/ reste installable seul (pip install -r marketing/requirements.txt) dans un
+# environnement neuf.
+anthropic>=0.40.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+schedule>=1.2.0
+Pillow>=10.0.0

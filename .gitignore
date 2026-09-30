@@ -1,0 +1,30 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+remotion/node_modules/
+remotion/public/audio/
+
+# Runtime state (access grants, pricing state, sales log, LMS progress) is never committed —
+# it lives on the persistent disk in production, not in the repo.
+data/bloc4_lms/
+data/marketing_images/
+data/pricing/
+
+marketing/generated/images/*
+!marketing/generated/images/.gitkeep
+marketing/logs/*
+!marketing/logs/.gitkeep
+marketing/analytics/*
+!marketing/analytics/.gitkeep
+marketing/strategy/*
+!marketing/strategy/.gitkeep
+
+pipeline/checkpoints/*.json
+pipeline/reports/*
+!pipeline/reports/.gitkeep
+pipeline/produced_courses.json
+pipeline/pending_validation.json
+pipeline/scheduler_state.json
+pipeline/scheduler.log

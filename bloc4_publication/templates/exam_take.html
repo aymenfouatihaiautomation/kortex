@@ -1,0 +1,27 @@
+{% extends "base_reading.html" %}
+{% block title %}Examen final — {{ course.title }}{% endblock %}
+{% block content %}
+<div class="read-col">
+<span class="chapter-eyebrow">Examen final</span>
+<h1 class="chapter-title">Examen final — {{ course.title }}</h1>
+<p class="dash-sub">Réponds aux {{ questions|length }} questions ci-dessous. Score minimum pour réussir : 70 %. Réessais illimités : un nouveau tirage de questions est fait à chaque tentative.</p>
+
+<form method="post" class="exam-form">
+  {% for q in questions %}
+  <input type="hidden" name="question_id" value="{{ q.id }}">
+  <div class="exercise-card">
+    <p class="q">{{ loop.index }}. {{ q.question }}</p>
+    <div class="opt-list">
+      {% for opt in q.shuffled_options %}
+      <label class="exam-option">
+        <input type="radio" name="answer_{{ q.id }}" value="{{ opt }}" required>
+        <span>{{ opt }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn-reveal">Soumettre l'examen</button>
+</form>
+</div>
+{% endblock %}
